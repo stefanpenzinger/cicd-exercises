@@ -156,10 +156,65 @@ func (a *App) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) getFilteredProductsByPriceRange(w http.ResponseWriter, r *http.Request) {
+	minPriceStr := r.URL.Query().Get("min_price")
+	maxPriceStr := r.URL.Query().Get("max_price")
+
+	minPrice, err := strconv.ParseFloat(minPriceStr, 64)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid min_price parameter")
+	}
+	maxPrice, err := strconv.ParseFloat(maxPriceStr, 64)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid max_price parameter")
+		return
+	}
+
+	if minPrice > maxPrice {
+		respondWithError(w, http.StatusBadRequest, "min_price must be less than max_price")
+		return
+	}
+
+	products, err := filterProductsByPriceRange(a.DB, minPrice, maxPrice)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error querying database")
+		return
+	}
+
+	// Encode products as JSON and send response
+	respondWithJSON(w, http.StatusOK, products)
+}
+
+func (a *App) getProductsByName(w http.ResponseWriter, r *http.Request) {
+	search := r.URL.Query().Get("search")
+	if search == "" {
+		respondWithError(w, http.StatusBadRequest, "Missing search parameter")
+		return
+	}
+	respondWithJSON(w, http.StatusOK, search)
+	return
+
+	products, err := findProductsByName(a.DB, search)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, products)
+}
+
 func (a *App) initializeRoutes() {
+	productIdRoute := "/product/{id:[0-9]+}"
+
 	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.updateProduct).Methods("PUT")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
+	a.Router.HandleFunc(productIdRoute, a.getProduct).Methods("GET")
+	a.Router.HandleFunc(productIdRoute, a.updateProduct).Methods("PUT")
+	a.Router.HandleFunc(productIdRoute, a.deleteProduct).Methods("DELETE")
+
+	// ### New Features ###
+	// Search products by name
+	a.Router.HandleFunc("/products/search", a.getProductsByName).Methods("GET")
+	// Filter products for a given price range
+	a.Router.HandleFunc("/products/filter", a.getFilteredProductsByPriceRange).Methods("GET")
 }
