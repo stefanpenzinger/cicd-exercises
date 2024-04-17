@@ -225,7 +225,7 @@ func TestFilterProducts(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &products)
 
 	if len(products) != expected {
-		t.Errorf("Expected 4 products. Got %d", len(products))
+		t.Errorf("Expected %d products. Got %d", expected, len(products))
 	}
 }
 
@@ -249,6 +249,47 @@ func TestFilterProductsMissingQueryParams(t *testing.T) {
 func TestFilterProductsMinPriceBiggerThanMaxPrice(t *testing.T) {
 	minPriceBiggerThanMaxPrice, _ := http.NewRequest("GET", "/products/filter?min_price=40&max_price=10", nil)
 	response := executeRequest(minPriceBiggerThanMaxPrice)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+}
+
+func TestSearchProducts(t *testing.T) {
+	searchTerm := "Product"
+	expected := 11
+
+	clearTable()
+	addProducts(expected)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/products/search?term=%s", searchTerm), nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	var products []map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &products)
+
+	if len(products) != expected {
+		t.Errorf("Expected %d products. Got %d", expected, len(products))
+	}
+
+	expected = 2
+	searchTerm = "1"
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/products/search?term=%s", searchTerm), nil)
+	response = executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	json.Unmarshal(response.Body.Bytes(), &products)
+
+	if len(products) != expected {
+		t.Errorf("Expected %d products. Got %d", expected, len(products))
+	}
+}
+
+func TestSearchProductsMissingQueryParam(t *testing.T) {
+	missingQueryParam, _ := http.NewRequest("GET", "/products/search", nil)
+	response := executeRequest(missingQueryParam)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
 }

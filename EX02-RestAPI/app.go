@@ -157,21 +157,24 @@ func (a *App) deleteProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getFilteredProductsByPriceRange(w http.ResponseWriter, r *http.Request) {
-	minPriceStr := r.URL.Query().Get("min_price")
-	maxPriceStr := r.URL.Query().Get("max_price")
+	minPriceParam := "min_price"
+	maxPriceParam := "max_price"
+
+	minPriceStr := r.URL.Query().Get(minPriceParam)
+	maxPriceStr := r.URL.Query().Get(maxPriceParam)
 
 	minPrice, err := strconv.ParseFloat(minPriceStr, 64)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid min_price parameter")
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Invalid %s parameter", minPriceParam))
 	}
 	maxPrice, err := strconv.ParseFloat(maxPriceStr, 64)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid max_price parameter")
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Invalid %s parameter", maxPriceParam))
 		return
 	}
 
 	if minPrice > maxPrice {
-		respondWithError(w, http.StatusBadRequest, "min_price must be less than max_price")
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("%s must be less than %s", minPriceParam, maxPriceParam))
 		return
 	}
 
@@ -186,9 +189,11 @@ func (a *App) getFilteredProductsByPriceRange(w http.ResponseWriter, r *http.Req
 }
 
 func (a *App) getProductsByName(w http.ResponseWriter, r *http.Request) {
-	search := r.URL.Query().Get("search")
+	termParam := "term"
+
+	search := r.URL.Query().Get(termParam)
 	if search == "" {
-		respondWithError(w, http.StatusBadRequest, "Missing search parameter")
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Missing %s parameter", termParam))
 		return
 	}
 
