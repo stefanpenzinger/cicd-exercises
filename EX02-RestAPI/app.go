@@ -191,8 +191,6 @@ func (a *App) getProductsByName(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Missing search parameter")
 		return
 	}
-	respondWithJSON(w, http.StatusOK, search)
-	return
 
 	products, err := findProductsByName(a.DB, search)
 	if err != nil {
