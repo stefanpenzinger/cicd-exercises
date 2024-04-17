@@ -205,3 +205,50 @@ func TestDeleteProduct(t *testing.T) {
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestFilterProducts(t *testing.T) {
+	created := 10
+	expected := 4
+
+	minPrice := 10
+	maxPrice := minPrice * expected
+
+	clearTable()
+	addProducts(created)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/products/filter?min_price=%d&max_price=%d", minPrice, maxPrice), nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	var products []map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &products)
+
+	if len(products) != expected {
+		t.Errorf("Expected 4 products. Got %d", len(products))
+	}
+}
+
+func TestFilterProductsMissingQueryParams(t *testing.T) {
+	missingQueryParams, _ := http.NewRequest("GET", "/products/filter", nil)
+	response := executeRequest(missingQueryParams)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+
+	missingMinPriceParam, _ := http.NewRequest("GET", "/products/filter?max_price=40", nil)
+	response = executeRequest(missingMinPriceParam)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+
+	missingMaxPriceParam, _ := http.NewRequest("GET", "/products/filter?min_price=10", nil)
+	response = executeRequest(missingMaxPriceParam)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+}
+
+func TestFilterProductsMinPriceBiggerThanMaxPrice(t *testing.T) {
+	minPriceBiggerThanMaxPrice, _ := http.NewRequest("GET", "/products/filter?min_price=40&max_price=10", nil)
+	response := executeRequest(minPriceBiggerThanMaxPrice)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+}
