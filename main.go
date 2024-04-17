@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func getenvOrDefault(key, defaultValue string) string {
+func getEnvOrDefault(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
 		return defaultValue
@@ -23,10 +23,10 @@ func main() {
 
 	a := App{}
 	a.Initialize(
-		getenvOrDefault("APP_DB_USERNAME", "postgres"),
-		getenvOrDefault("APP_DB_PASSWORD", ""),
-		getenvOrDefault("APP_DB_NAME", "postgres"))
+		getEnvOrDefault("APP_DB_USERNAME", "postgres"),
+		getEnvOrDefault("APP_DB_PASSWORD", ""),
+		getEnvOrDefault("APP_DB_NAME", "postgres"))
 
 	//List env variables (bash): printenv
-	a.Run(getenvOrDefault("APP_PORT", ":8010"))
+	a.Run(getEnvOrDefault("APP_PORT", ":8010"))
 }
