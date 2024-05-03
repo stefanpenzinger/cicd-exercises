@@ -20,6 +20,7 @@
 # Go workspace file
 go.work
 
-.idea/sonarlint/**
+.idea/**
 
 EX02-RestAPI/cicd-exercises
+
