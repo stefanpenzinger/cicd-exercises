@@ -32,8 +32,8 @@ jobs:
         run: cd EX02-RestAPI
 
       - name: Build
-        run: go build -v ./...
+        run: go build -v
 
       - name: Test
-        run: go test -v ./...
+        run: go test -v
 
