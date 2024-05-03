@@ -28,8 +28,8 @@ jobs:
         with:
           go-version: '1.20'
 
-      - name: Change directory to EX02
-        run: cd EX02-RestAPI
+      - name: Change directory to EX02 and build
+        run: ls
 
       - name: Build
         run: go build -v
