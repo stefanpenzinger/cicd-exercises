@@ -28,9 +28,9 @@ jobs:
         with:
           go-version: '1.22.2'
 
-      - name: Change directory to EX02-RestAPI
+      - name: Change directory to EX02-RestAPI and Build
         run: cd EX02-RestAPI && go build -v
 
-      - name: Test
-        run: go test -v
+      - name: Change directory to EX02-RestAPI and Test
+        run: cd EX02-RestAPI && go test -v
 
