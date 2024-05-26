@@ -1,8 +1,10 @@
 name: Docker Image CI
 
-variables:
-  - name: repository
-    value: cicd-exercises
+env:
+  REPOSITORY: cicd-exercises
+  TRIVY_IMAGE_RESULTS: trivy-image-results.sarif
+  TRIVY_REPO_RESULTS: trivy-repo-results.sarif
+  TRIVY_IAC_RESULTS: trivy-iac-results.sarif
 
 on:
   push:
@@ -39,15 +41,15 @@ jobs:
           context: ./EX04-CI-with-GitHubActions
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ variables.repository }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ variables.repository }}:${{ steps.get_sha.outputs.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPOSITORY }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPOSITORY }}:${{ steps.get_sha.outputs.sha }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ variables.repository }}:${{ steps.get_sha.outputs.sha }}'
+          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPOSITORY }}:${{ steps.get_sha.outputs.sha }}'
           format: 'sarif'
-          output: 'trivy-image-results.sarif'
+          output: ${{ env.TRIVY_IMAGE_RESULTS }}
 
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@0.20.0
@@ -55,7 +57,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'sarif'
-          output: 'trivy-repo-results.sarif'
+          output: ${{ env.TRIVY_REPO_RESULTS }}
           severity: 'CRITICAL'
 
       - name: Run Trivy vulnerability scanner in IaC mode
@@ -64,7 +66,7 @@ jobs:
           scan-type: 'config'
           hide-progress: true
           format: 'sarif'
-          output: 'trivy-iac-results.sarif'
+          output: ${{ env.TRIVY_IAC_RESULTS }}
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
@@ -72,16 +74,16 @@ jobs:
       - name: Upload Trivy scan results to GitHub Security tab (Image)
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'trivy-image-results.sarif'
+          sarif_file: ${{ env.TRIVY_IMAGE_RESULTS }}
           category: 'container'
       - name: Upload Trivy scan results to GitHub Security tab (Code)
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'trivy-repo-results.sarif'
+          sarif_file: ${{ env.TRIVY_REPO_RESULTS }}
           category: 'code'
       - name: Upload Trivy scan results to GitHub Security tab (IaC)
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'trivy-iac-results.sarif'
+          sarif_file: ${{ env.TRIVY_IAC_RESULTS }}
           category: 'code'
 
