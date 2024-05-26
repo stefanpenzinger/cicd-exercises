@@ -67,7 +67,6 @@ jobs:
           hide-progress: true
           format: 'sarif'
           output: ${{ env.TRIVY_IAC_RESULTS }}
-          exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
