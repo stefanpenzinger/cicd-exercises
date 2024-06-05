@@ -28,11 +28,11 @@ jobs:
         with:
           go-version: '1.22.2'
 
-      - name: Change directory to EX02-RestAPI and Build
-        run: cd EX02-RestAPI && go build -v
+      - name: Change directory to EX02-RestAPI-EX03-CI-with-SonarCloud and Build
+        run: cd EX02-RestAPI-EX03-CI-with-SonarCloud && go build -v
 
-      - name: Change directory to EX02-RestAPI and Test
-        run: cd EX02-RestAPI && go test -v
+      - name: Change directory to EX02-RestAPI-EX03-CI-with-SonarCloud and Test
+        run: cd EX02-RestAPI-EX03-CI-with-SonarCloud && go test -v
 
   sonarcloud:
     name: Start SonarCloud code analysis
