@@ -18,4 +18,7 @@ The following points describe the contents of this course:
 ## Exercises:
 The following exercises were done:
 - [EX01-GitExercises](EX01-GitExercises/README.md)
-- [EX02-RestAPI](EX02-RestAPI/README.md)
+- [EX02-RestAPI](EX02-RestAPI-EX03-CI-with-SonarCloud/README.md)
+- [EX03-CI-with-SonarCloud](EX02-RestAPI-EX03-CI-with-SonarCloud/README.md)
+- [EX04-CD-with-GitHubActions](EX04-CD-with-GitHubActions/README.md)
+- [EX05-CD-with-Kubernetes](EX05-CD-with-Kubernetes/README.md)
